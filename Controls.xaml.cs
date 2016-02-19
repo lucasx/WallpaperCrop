@@ -32,31 +32,98 @@ namespace WPF_WallpaperCrop_v2
             preview.Show();
         }
 
+        ////////////////////////// Window Stuff ///////////////////////////////
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            maximizeOnRightmostScreen();
+            orientOnScreen(Side.Right);
         }
 
-        private void maximizeOnRightmostScreen()
+        enum Side { Left, Right };
+        bool onRightmostScreen;
+        private void orientOnScreen(Side which)
         {
+            int X_MARGIN = 300; // Margin in pixels between right side of the screen and right side of this
+            int Y_MARGIN = 200;
+
             Screen[] sc = Screen.AllScreens;
             int nScreens = sc.Length;
 
-            // Show this window on the rightmost screen
+            // Show this window on the given screen
             if (nScreens > 1)
             {
-                Screen rightmostScreen = sc[nScreens - 1];
-                this.Left = rightmostScreen.Bounds.Left;
-                this.Top = rightmostScreen.Bounds.Top;
+                Screen screen;
+                if(which == Side.Left)
+                {
+                    screen = sc[1]; // TODO: Generalize for all monitor setups by using virtual screen
+                    onRightmostScreen = false;
+                } else
+                {
+                    screen = sc[nScreens - 1];
+                    onRightmostScreen = true;
+                }
+
+                System.Drawing.Rectangle bounds = screen.Bounds;
+                this.Left = bounds.Right - this.Width - X_MARGIN;
+                this.Top = bounds.Bottom - this.Height - Y_MARGIN;
+                //this.Left = screen.Bounds.Left;
+                //this.Top = screen.Bounds.Top;
             }
 
-            // Maximize window
-            this.WindowState = WindowState.Maximized; // If I remember correctly maximizeOnRightmostScreen() must be called after window load for this to work.
+            //// Maximize window
+            //this.WindowState = WindowState.Maximized; // If I remember correctly maximizeOnRightmostScreen() must be called after window load for this to work.
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Topmost = true;
+        }
+
+        public void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Q)
+            {
+                Hide();
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                Close();
+            }
+
+            if (e.Key == Key.Tab)
+            {
+                switchMonitors();
+            }
+        }
+
+        public void Window_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Q)
+            {
+                Show();
+                Topmost = true;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             preview.Close();
+        }
+
+        private void switchMonitors()
+        {
+
+            if (onRightmostScreen)
+            {
+                // swap to left screen
+                orientOnScreen(Side.Left);
+            }
+            else
+            {
+                // swap to right screen
+                orientOnScreen(Side.Right);
+            }
         }
 
         ///////////////////////////////// Control functionality stuff //////////////////////////////////////////

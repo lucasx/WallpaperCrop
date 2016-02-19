@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_WallpaperCrop_v2"
         mc:Ignorable="d"
-        Title="Controls" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Controls" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing" Deactivated="Window_Deactivated" SizeToContent="Height" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
