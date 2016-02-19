@@ -36,14 +36,6 @@ namespace WPF_WallpaperCrop_v2
             configureDragging();
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                controls.Close();
-            }
-        }
-
         /* Sets up window frame with no borders and sets it to span
          * all screens.
          * Usage: Must be called before window is loaded in order to turn borders off. */
@@ -56,9 +48,31 @@ namespace WPF_WallpaperCrop_v2
 
             // span monitors
             this.Left = -1920;
-            this.Width = SystemParameters.VirtualScreenWidth;
+            this.Width = SystemParameters.VirtualScreenWidth;// * 2 / 3.0;
             this.Top = 0;
             this.Height = SystemParameters.VirtualScreenHeight;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Q)
+            {
+                controls.Hide();
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                controls.Close();
+            }
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Q)
+            {
+                controls.Show();
+                controls.Topmost = true;
+            }
         }
 
 
