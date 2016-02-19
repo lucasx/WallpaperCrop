@@ -47,7 +47,6 @@ namespace WPF_WallpaperCrop_v2
         /* Sets up window frame with no borders and sets it to span
          * all screens.
          * Usage: Must be called before window is loaded in order to turn borders off. */
-        // TODO: Make it work for different monitor configurations, perhaps with dialog box asking about monitor order
         private void configureWindow()
         {
             //int nMonitors = System.Windows.Forms.SystemInformation.MonitorCount;

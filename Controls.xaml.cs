@@ -32,6 +32,8 @@ namespace WPF_WallpaperCrop_v2
             preview.Show();
         }
 
+        ////////////////////////// Window Stuff ///////////////////////////////
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             maximizeOnRightmostScreen();
@@ -52,6 +54,11 @@ namespace WPF_WallpaperCrop_v2
 
             // Maximize window
             this.WindowState = WindowState.Maximized; // If I remember correctly maximizeOnRightmostScreen() must be called after window load for this to work.
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Topmost = true;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
