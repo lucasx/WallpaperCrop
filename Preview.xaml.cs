@@ -55,24 +55,12 @@ namespace WPF_WallpaperCrop_v2
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Q)
-            {
-                controls.Hide();
-            }
-
-            if (e.Key == Key.Escape)
-            {
-                controls.Close();
-            }
+            controls.Window_KeyDown(sender, e);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Q)
-            {
-                controls.Show();
-                controls.Topmost = true;
-            }
+            controls.Window_KeyUp(sender, e);
         }
 
 

@@ -67,7 +67,7 @@ namespace WPF_WallpaperCrop_v2
             Topmost = true;
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        public void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Q)
             {
@@ -80,7 +80,7 @@ namespace WPF_WallpaperCrop_v2
             }
         }
 
-        private void Window_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        public void Window_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Q)
             {
