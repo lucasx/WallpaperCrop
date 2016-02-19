@@ -45,22 +45,21 @@ namespace WPF_WallpaperCrop_v2
         }
 
         /* Sets up window frame with no borders and sets it to span
-         * the left two screens: all except the rightmost one, where the controls are.
+         * all screens.
          * Usage: Must be called before window is loaded in order to turn borders off. */
         // TODO: Make it work for different monitor configurations, perhaps with dialog box asking about monitor order
         private void configureWindow()
         {
-            int nMonitors = System.Windows.Forms.SystemInformation.MonitorCount;
-            Debug.Assert(nMonitors > 1);
+            //int nMonitors = System.Windows.Forms.SystemInformation.MonitorCount;
 
             this.WindowStyle = WindowStyle.None; // Gets rid of top bar
             this.AllowsTransparency = true; // Gets rid of window-resize borders
 
-            // span left two monitors
+            // span monitors
             this.Left = -1920;
-            this.Width = System.Windows.SystemParameters.VirtualScreenWidth * 2 / 3;
+            this.Width = SystemParameters.VirtualScreenWidth;
             this.Top = 0;
-            this.Height = System.Windows.SystemParameters.VirtualScreenHeight;
+            this.Height = SystemParameters.VirtualScreenHeight;
         }
 
 
