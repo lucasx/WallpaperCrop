@@ -36,11 +36,14 @@ namespace WPF_WallpaperCrop_v2
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            maximizeOnRightmostScreen();
+            orientOnRightmostScreen();
         }
 
-        private void maximizeOnRightmostScreen()
+        private void orientOnRightmostScreen()
         {
+            int X_MARGIN = 300; // Margin in pixels between right side of the screen and right side of this
+            int Y_MARGIN = 200;
+
             Screen[] sc = Screen.AllScreens;
             int nScreens = sc.Length;
 
@@ -48,12 +51,15 @@ namespace WPF_WallpaperCrop_v2
             if (nScreens > 1)
             {
                 Screen rightmostScreen = sc[nScreens - 1];
-                this.Left = rightmostScreen.Bounds.Left;
-                this.Top = rightmostScreen.Bounds.Top;
+                System.Drawing.Rectangle bounds = rightmostScreen.Bounds;
+                this.Left = bounds.Right - this.Width - X_MARGIN;
+                this.Top = bounds.Bottom - this.Height - Y_MARGIN;
+                //this.Left = rightmostScreen.Bounds.Left;
+                //this.Top = rightmostScreen.Bounds.Top;
             }
 
-            // Maximize window
-            this.WindowState = WindowState.Maximized; // If I remember correctly maximizeOnRightmostScreen() must be called after window load for this to work.
+            //// Maximize window
+            //this.WindowState = WindowState.Maximized; // If I remember correctly maximizeOnRightmostScreen() must be called after window load for this to work.
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
