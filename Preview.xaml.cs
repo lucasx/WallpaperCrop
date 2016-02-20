@@ -89,8 +89,47 @@ namespace WPF_WallpaperCrop_v2
                     Point diff = new Point(newPoint.X - basePoint.X, newPoint.Y - basePoint.Y);
 
                     // Update image
-                    Canvas.SetLeft(image, Canvas.GetLeft(image) + diff.X);
-                    Canvas.SetTop(image, Canvas.GetTop(image) + diff.Y);
+                    if (image.ActualWidth > 5760)
+                    {
+                        double newLeft = Canvas.GetLeft(image) + diff.X;
+                        double newRight = newLeft + image.ActualWidth;
+                        if (-5760 / 2 < newLeft)
+                        {
+                            newLeft = -5760 / 2;
+                        }
+                        else
+                        {
+                            if (newRight < 5760 / 2)
+                            {
+                                newLeft = 5760 / 2 - image.ActualWidth;
+                            }
+                            else
+                            {
+                                Canvas.SetLeft(image, newLeft);
+                            }
+                        }
+                    }
+
+                    if (image.ActualHeight > 1080)
+                    {
+                        double newTop = Canvas.GetTop(image) + diff.Y;
+                        double newBottom = newTop + image.ActualHeight;
+                        if (-1080 / 2 < newTop)
+                        {
+                            newTop = -1080 / 2;
+                        }
+                        else
+                        {
+                            if (newBottom < 1080 / 2)
+                            {
+                                newTop = 1080 / 2 - image.ActualHeight;
+                            }
+                            else
+                            {
+                                Canvas.SetTop(image, newTop);
+                            }
+                        }
+                    }
 
                     basePoint = newPoint;
                 }
