@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace WPF_WallpaperCrop_v2
 {
@@ -128,16 +129,27 @@ namespace WPF_WallpaperCrop_v2
 
         ///////////////////////////////// Control functionality stuff //////////////////////////////////////////
 
-        private void chooseImage(object sender, RoutedEventArgs e)
+        private void importImage(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog chooseImage = new OpenFileDialog();
-            chooseImage.Title = "Choose Image";
-            chooseImage.Filter = "JPG|*.jpg|PNG|*.png";
-            if (chooseImage.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFileDialog imageChooser = new OpenFileDialog();
+            imageChooser.Title = "Choose Image";
+            imageChooser.Filter = "JPG|*.jpg|PNG|*.png";
+            if (imageChooser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                BitmapImage bitmapimage = new BitmapImage(new Uri(chooseImage.SafeFileName, UriKind.Relative));
+                BitmapImage bitmapimage = new BitmapImage(new Uri(imageChooser.SafeFileName, UriKind.Relative));
                 image.Source = bitmapimage;
                 preview.setImage(bitmapimage);
+            }
+        }
+
+        private void exportWallpaper(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog wallpaperSaver = new SaveFileDialog();
+            wallpaperSaver.Filter = "PNG|*.png";
+            if (wallpaperSaver.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string path = wallpaperSaver.FileName;
+                // TODO: export cropped/bordered image to file
             }
         }
 
