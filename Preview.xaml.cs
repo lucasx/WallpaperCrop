@@ -118,5 +118,16 @@ namespace WPF_WallpaperCrop_v2
             Canvas.SetLeft(image, -image.Width / 2);
             Canvas.SetTop(image, -image.Height / 2);
         }
+
+        internal Int32Rect getCropRect()
+        {
+            // Assumes canvas is based at the center of the screen and the focus of the canvas is its center
+            Int32Rect r = new Int32Rect();
+            r.X = -5760 / 2 - (int)Canvas.GetLeft(image);
+            r.Y = -1080 / 2 - (int)Canvas.GetTop(image);
+            r.Width = 5760;
+            r.Height = 1080;
+            return r;
+        }
     }
 }

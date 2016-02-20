@@ -148,8 +148,16 @@ namespace WPF_WallpaperCrop_v2
             wallpaperSaver.Filter = "PNG|*.png";
             if (wallpaperSaver.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                // Crop image
+                Int32Rect cropRect = preview.getCropRect();
+                CroppedBitmap cropped = new CroppedBitmap((BitmapSource)image.Source, cropRect);
+
+                // Save image
                 string path = wallpaperSaver.FileName;
-                // TODO: export cropped/bordered image to file
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(cropped));
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                    encoder.Save(stream);
             }
         }
 
