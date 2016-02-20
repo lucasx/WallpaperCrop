@@ -16,7 +16,7 @@ This application currently only runs well on triple-monitor setups of three scre
 ## Functionality so far
 -Controls window to manipulate the image; Preview window to view full-size image
 
--Choose image using the Choose Image... button
+-Select an image using the Import Image... button
 
 -Pan around image by clicking/dragging the image in the preview window
 
@@ -25,6 +25,8 @@ This application currently only runs well on triple-monitor setups of three scre
 -Temporarily hide the controls window by holding down 'Q'.
 
 -Move the controls window to the opposite screen by pressing Tab.
+
+-When you're satisfied with the preview, click Export wallpaper... to save a png of the new image.
 
 -Press Esc to close the application.
 
