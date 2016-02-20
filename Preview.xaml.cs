@@ -105,9 +105,9 @@ namespace WPF_WallpaperCrop_v2
                             }
                             else
                             {
-                                Canvas.SetLeft(image, newLeft);
                             }
                         }
+                        Canvas.SetLeft(image, newLeft);
                     }
 
                     if (image.ActualHeight > 1080)
@@ -126,9 +126,9 @@ namespace WPF_WallpaperCrop_v2
                             }
                             else
                             {
-                                Canvas.SetTop(image, newTop);
                             }
                         }
+                        Canvas.SetTop(image, newTop);
                     }
 
                     basePoint = newPoint;
