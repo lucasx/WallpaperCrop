@@ -105,6 +105,7 @@ namespace WPF_WallpaperCrop_v2
                             }
                             else
                             {
+                                basePoint.X = newPoint.X;
                             }
                         }
                         Canvas.SetLeft(image, newLeft);
@@ -126,12 +127,12 @@ namespace WPF_WallpaperCrop_v2
                             }
                             else
                             {
+                                basePoint.Y = newPoint.Y;
                             }
                         }
                         Canvas.SetTop(image, newTop);
                     }
 
-                    basePoint = newPoint;
                 }
             };
 
