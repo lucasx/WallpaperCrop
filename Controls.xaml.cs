@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.IO;
 
 namespace WPF_WallpaperCrop_v2
 {
@@ -148,14 +148,14 @@ namespace WPF_WallpaperCrop_v2
             wallpaperSaver.Filter = "PNG|*.png";
             if (wallpaperSaver.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                // Crop image
-                Int32Rect cropRect = preview.getCropRect();
-                CroppedBitmap cropped = new CroppedBitmap((BitmapSource)image.Source, cropRect);
+                // Extrude wallpaper
+                Int32Rect bounds = preview.getBounds();
+                BitmapSource wallpaper = extrudeTo(bounds, (BitmapSource)image.Source);
 
-                // Save image
+                // Save result
                 string path = wallpaperSaver.FileName;
                 var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(cropped));
+                encoder.Frames.Add(BitmapFrame.Create(wallpaper));
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                     encoder.Save(stream);
             }
@@ -164,6 +164,26 @@ namespace WPF_WallpaperCrop_v2
         private void centerImage(object sender, RoutedEventArgs e)
         {
             preview.centerImage();
+        }
+
+        ///////////////////////////////// Image processing stuff ////////////////////////////////////////////
+
+        /* Crops the src to fit in the bounds, then fills any unoccupied pixels
+         * with blackspace. Returns a bitmap that is the exact size of the bounds. */
+        private BitmapSource extrudeTo(Int32Rect bounds, BitmapSource src)
+        {
+            // Crop src image
+            Int32Rect cropRect = new Int32Rect();
+            cropRect.X = Math.Max(0, bounds.X);
+            cropRect.Y = Math.Max(0, bounds.Y);
+            cropRect.Width = Math.Min(src.PixelWidth - cropRect.X, bounds.Width);
+            cropRect.Height = Math.Min(bounds.Height, src.PixelHeight - cropRect.Y);
+
+            BitmapSource cropped = new CroppedBitmap((BitmapSource)image.Source, cropRect);
+
+            // Pad with blackspace
+
+            return cropped;
         }
     }
 }
