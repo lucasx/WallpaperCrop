@@ -159,9 +159,11 @@ namespace WPF_WallpaperCrop_v2
             Canvas.SetTop(image, -image.Height / 2);
         }
 
-        internal Int32Rect getCropRect()
+        /* Returns a rectange in the image's coordinate system (origin at top left of image)
+         * representing the bounds of the preview. */
+        internal Int32Rect getBounds()
         {
-            // Assumes canvas is based at the center of the screen and the focus of the canvas is its center
+            // Assumes the canvas origin is at the center of the window/screen
             Int32Rect r = new Int32Rect();
             r.X = -5760 / 2 - (int)Canvas.GetLeft(image);
             r.Y = -1080 / 2 - (int)Canvas.GetTop(image);
