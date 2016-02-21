@@ -9,7 +9,7 @@
     <Grid>
         <Rectangle Fill="Black" />
         <Canvas HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image x:Name="image" Height="1600" Canvas.Left="-3840" Canvas.Top="-800" Width="7680" Source="111111.jpg" SnapsToDevicePixels="True"/>
+            <Image x:Name="image" SnapsToDevicePixels="True"/>
         </Canvas>
 
     </Grid>

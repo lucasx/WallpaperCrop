@@ -11,6 +11,7 @@ wallpapers, yet have multi-monitor setups and have trouble coming across wallpap
 Use this application to resize, zoom, crop, pad, and convert images before using them as wallpapers.
 
 ## Current Limitations
+Cannot export images that do not entirely fill the full size of the wallpaper.
 This application currently only runs well on triple-monitor setups of three screens each with resolution 1920x1080.
 
 ## Functionality so far
