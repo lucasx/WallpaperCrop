@@ -136,7 +136,8 @@ namespace WPF_WallpaperCrop_v2
             imageChooser.Filter = "JPG|*.jpg|PNG|*.png";
             if (imageChooser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                BitmapImage bitmapimage = new BitmapImage(new Uri(imageChooser.SafeFileName, UriKind.Relative));
+                Uri imageUri = new Uri(imageChooser.FileName);
+                BitmapImage bitmapimage = new BitmapImage(imageUri);
                 image.Source = bitmapimage;
                 preview.setImage(bitmapimage);
             }
@@ -179,11 +180,20 @@ namespace WPF_WallpaperCrop_v2
             cropRect.Width = Math.Min(src.PixelWidth - cropRect.X, bounds.Width);
             cropRect.Height = Math.Min(bounds.Height, src.PixelHeight - cropRect.Y);
 
-            BitmapSource cropped = new CroppedBitmap((BitmapSource)image.Source, cropRect);
-
             // Pad with blackspace
+            WriteableBitmap result = new WriteableBitmap(5760, 1080, src.DpiX, src.DpiY, src.Format, src.Palette);
 
-            return cropped;
+            Int32Rect imagePos = new Int32Rect();
+            imagePos.X = -Math.Min(bounds.X, 0);    imagePos.Y = -Math.Min(bounds.Y, 0);
+            imagePos.Width = cropRect.Width;        imagePos.Height = cropRect.Height;
+
+            int stride = src.PixelWidth * src.Format.BitsPerPixel / 8; // bytes per row of pixels in the image
+            byte[] pixels = new byte[src.PixelHeight * stride];
+            src.CopyPixels(cropRect, pixels, stride, 0);
+
+            result.WritePixels(imagePos, pixels, stride, 0);
+
+            return result;
         }
     }
 }
