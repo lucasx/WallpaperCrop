@@ -45,7 +45,7 @@ namespace WPF_WallpaperCrop_v2
         private void orientOnScreen(Side which)
         {
             int X_MARGIN = 300; // Margin in pixels between right side of the screen and right side of this
-            int Y_MARGIN = 200;
+            int Y_MARGIN = 300;
 
             Screen[] sc = Screen.AllScreens;
             int nScreens = sc.Length;

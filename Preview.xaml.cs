@@ -34,6 +34,7 @@ namespace WPF_WallpaperCrop_v2
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             configureDragging();
+            configureZooming();
         }
 
         /* Sets up window frame with no borders and sets it to span
@@ -139,6 +140,21 @@ namespace WPF_WallpaperCrop_v2
             image.MouseLeftButtonUp += (ss, ee) => {
                 image.ReleaseMouseCapture();
                 dragging = false;
+            };
+        }
+
+        public void configureZooming()
+        {
+            image.MouseWheel += (ss, ee) =>
+            {
+                Matrix mat = image.RenderTransform.Value;
+                Point mouse = ee.GetPosition(image);
+
+                if (ee.Delta > 0) mat.ScaleAtPrepend(1.15, 1.15, mouse.X, mouse.Y);
+                else mat.ScaleAtPrepend(1 / 1.15, 1 / 1.15, mouse.X, mouse.Y);
+
+                MatrixTransform mtf = new MatrixTransform(mat);
+                image.RenderTransform = mtf;
             };
         }
 
