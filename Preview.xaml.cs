@@ -33,8 +33,8 @@ namespace WPF_WallpaperCrop_v2
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            configureDragging();
-            configureZooming();
+            //configureDragging();
+            //configureZooming();
         }
 
         /* Sets up window frame with no borders and sets it to span
