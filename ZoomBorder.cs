@@ -123,7 +123,7 @@ namespace WPF_WallpaperCrop_v2
 
         void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.Reset();
+            //this.Reset();
         }
 
         private void child_MouseMove(object sender, MouseEventArgs e)

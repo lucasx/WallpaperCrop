@@ -74,11 +74,8 @@ namespace WPF_WallpaperCrop_v2
             image.Height = bitmapImage.PixelHeight;
 
             // center on canvas
-            Canvas.SetLeft(image, -image.Width / 2);
-            Canvas.SetTop(image, -image.Height / 2);
-
-            // center in viewer
-            centerImage();
+            double dx = (5760 - image.Width) / 2; Canvas.SetLeft(image, dx);
+            double dy = (1080 - image.Height) / 2; Canvas.SetTop(image, dy);
         }
 
         internal void centerImage()
