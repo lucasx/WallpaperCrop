@@ -33,8 +33,6 @@ namespace WPF_WallpaperCrop_v2
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //configureDragging();
-            //configureZooming();
         }
 
         /* Sets up window frame with no borders and sets it to span
@@ -67,97 +65,6 @@ namespace WPF_WallpaperCrop_v2
 
         ///////////////////////////////// Functionality stuff ///////////////////////////////////
 
-        /// Functionality to move image by dragging mouse ///
-        Point basePoint;
-        bool dragging = false;
-
-        /* Register mouse event handlers */
-        public void configureDragging()
-        {
-            image.MouseLeftButtonDown += (ss, ee) =>
-            {
-                dragging = true;
-                basePoint = ee.GetPosition(this);
-                image.CaptureMouse();
-            };
-
-            image.MouseMove += (ss, ee) =>
-            {
-                if (dragging == true)
-                {
-                    // Get distance moved
-                    Point newPoint = ee.GetPosition(this);
-                    Point diff = new Point(newPoint.X - basePoint.X, newPoint.Y - basePoint.Y);
-
-                    // Update image
-                    if (image.ActualWidth > 5760)
-                    {
-                        double newLeft = Canvas.GetLeft(image) + diff.X;
-                        double newRight = newLeft + image.ActualWidth;
-                        if (-5760 / 2 < newLeft)
-                        {
-                            newLeft = -5760 / 2;
-                        }
-                        else
-                        {
-                            if (newRight < 5760 / 2)
-                            {
-                                newLeft = 5760 / 2 - image.ActualWidth;
-                            }
-                            else
-                            {
-                                basePoint.X = newPoint.X;
-                            }
-                        }
-                        Canvas.SetLeft(image, newLeft);
-                    }
-
-                    if (image.ActualHeight > 1080)
-                    {
-                        double newTop = Canvas.GetTop(image) + diff.Y;
-                        double newBottom = newTop + image.ActualHeight;
-                        if (-1080 / 2 < newTop)
-                        {
-                            newTop = -1080 / 2;
-                        }
-                        else
-                        {
-                            if (newBottom < 1080 / 2)
-                            {
-                                newTop = 1080 / 2 - image.ActualHeight;
-                            }
-                            else
-                            {
-                                basePoint.Y = newPoint.Y;
-                            }
-                        }
-                        Canvas.SetTop(image, newTop);
-                    }
-
-                }
-            };
-
-            image.MouseLeftButtonUp += (ss, ee) => {
-                image.ReleaseMouseCapture();
-                dragging = false;
-            };
-        }
-
-        public void configureZooming()
-        {
-            image.MouseWheel += (ss, ee) =>
-            {
-                Matrix mat = image.RenderTransform.Value;
-                Point mouse = ee.GetPosition(image);
-
-                if (ee.Delta > 0) mat.ScaleAtPrepend(1.15, 1.15, mouse.X, mouse.Y);
-                else mat.ScaleAtPrepend(1 / 1.15, 1 / 1.15, mouse.X, mouse.Y);
-
-                MatrixTransform mtf = new MatrixTransform(mat);
-                image.RenderTransform = mtf;
-            };
-        }
-
         internal void setImage(BitmapImage bitmapImage)
         {
             image.Source = bitmapImage;
@@ -166,13 +73,17 @@ namespace WPF_WallpaperCrop_v2
             image.Width = bitmapImage.PixelWidth;
             image.Height = bitmapImage.PixelHeight;
 
+            // center on canvas
+            Canvas.SetLeft(image, -image.Width / 2);
+            Canvas.SetTop(image, -image.Height / 2);
+
+            // center in viewer
             centerImage();
         }
 
         internal void centerImage()
         {
-            Canvas.SetLeft(image, -image.Width / 2);
-            Canvas.SetTop(image, -image.Height / 2);
+            viewer.Reset();
         }
 
         /* Returns a rectange in the image's coordinate system (origin at top left of image)

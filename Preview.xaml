@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Preview" Height="300" Width="300" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
     <Grid>
-        <local:ZoomBorder x:Name="border" ClipToBounds="False" Background="Black">
+        <local:ZoomBorder x:Name="viewer" ClipToBounds="False" Background="Black">
             <Canvas HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image x:Name="image" SnapsToDevicePixels="True"/>
             </Canvas>
