@@ -89,10 +89,10 @@ namespace WPF_WallpaperCrop_v2
         {
             // Assumes the canvas origin is at the center of the window/screen
             Int32Rect r = new Int32Rect();
-            r.X = -5760 / 2 - (int)Canvas.GetLeft(image);
-            r.Y = -1080 / 2 - (int)Canvas.GetTop(image);
-            r.Width = 5760;
-            r.Height = 1080;
+            r.X = -(int)canvas.ActualWidth / 2 - (int)Canvas.GetLeft(image);
+            r.Y = -(int)canvas.ActualHeight / 2 - (int)Canvas.GetTop(image);
+            r.Width = (int)canvas.ActualWidth;
+            r.Height = (int)canvas.ActualHeight;
             return r;
         }
     }
