@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,6 +10,7 @@ namespace WPF_WallpaperCrop_v2
     public class ZoomBorder : Border
     {
         private UIElement child = null;
+        private UIElement endContent = null;
         private Point origin;
         private Point start;
 
@@ -22,6 +24,14 @@ namespace WPF_WallpaperCrop_v2
         {
             return (ScaleTransform)((TransformGroup)element.RenderTransform)
               .Children.First(tr => tr is ScaleTransform);
+        }
+
+        /* Get the real render bounds of the given element, taking
+         * render transforms into account. */
+        public Rect getEffectiveBounds(UIElement element)
+        {
+            FrameworkElement fElem = (FrameworkElement)element;
+            return element.RenderTransform.TransformBounds( new Rect(new Size(fElem.ActualWidth, fElem.ActualHeight)) );
         }
 
         public override UIElement Child
@@ -54,6 +64,15 @@ namespace WPF_WallpaperCrop_v2
                 this.PreviewMouseRightButtonDown += new MouseButtonEventHandler(
                   child_PreviewMouseRightButtonDown);
             }
+        }
+
+        /* Notify of the actual content this element is holding.
+         * Implications:
+         *      pan limits based on actual content size
+         */
+        internal void setEndContent(UIElement e)
+        {
+            endContent = e;
         }
 
         public void Reset()
@@ -124,6 +143,13 @@ namespace WPF_WallpaperCrop_v2
         void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //this.Reset();
+            MessageBox.Show(child.RenderSize.ToString());
+            //Image image = (Image)endContent;
+            Canvas canvas = (Canvas)child;
+            MessageBox.Show("canvas.Height: " + canvas.Height);
+            MessageBox.Show("canvas.ActualHeight: " + canvas.ActualHeight);
+            MessageBox.Show("canvas.DesiredSize.Height: " + canvas.DesiredSize.Height);
+            MessageBox.Show("canvas.RenderSize.Height: " + canvas.RenderSize.Height);
         }
 
         private void child_MouseMove(object sender, MouseEventArgs e)
@@ -134,8 +160,23 @@ namespace WPF_WallpaperCrop_v2
                 {
                     var tt = GetTranslateTransform(child);
                     Vector v = start - e.GetPosition(this);
-                    tt.X = origin.X - v.X;
-                    tt.Y = origin.Y - v.Y;
+                    double xf = origin.X - v.X;
+                    double yf = origin.Y - v.Y;
+
+                    // Keep within bounds
+                    Rect bounds = getEffectiveBounds(child);
+
+                    if (bounds.Width < child.RenderSize.Width)
+                    {
+                        xf = Math.Min(xf, bounds.Width / 2); // don't pan past edge of image
+                        tt.X = xf;
+                    }
+
+                    if (bounds.Height < child.RenderSize.Height)
+                    {
+                        yf = Math.Min(yf, bounds.Height / 2);
+                        tt.Y = yf;
+                    }
                 }
             }
         }
