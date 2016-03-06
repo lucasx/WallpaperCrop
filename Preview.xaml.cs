@@ -74,13 +74,13 @@ namespace WPF_WallpaperCrop_v2
             image.Height = bitmapImage.PixelHeight;
 
             // center on canvas
-            double dx = (5760 - image.Width) / 2; Canvas.SetLeft(image, dx);
-            double dy = (1080 - image.Height) / 2; Canvas.SetTop(image, dy);
+            double dx = (canvas.ActualWidth - image.Width) / 2; Canvas.SetLeft(image, dx);
+            double dy = (canvas.ActualHeight - image.Height) / 2; Canvas.SetTop(image, dy);
         }
 
         internal void centerImage()
         {
-            viewer.Reset();
+            canvas.Center();
         }
 
         /* Returns a rectange in the image's coordinate system (origin at top left of image)

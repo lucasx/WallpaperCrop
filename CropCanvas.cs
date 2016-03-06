@@ -27,6 +27,20 @@ namespace WPF_WallpaperCrop_v2
 
         public CropCanvas() : base()
         {
+            // add transforms to child
+            this.Loaded += new RoutedEventHandler(initChild);
+
+            // init transform handlers
+            this.MouseWheel += scaleChild;
+            this.MouseLeftButtonDown += startPan;
+            this.MouseLeftButtonUp += endPan;
+            this.MouseMove += panChild;
+            this.PreviewMouseRightButtonDown += new MouseButtonEventHandler(
+                child_PreviewMouseRightButtonDown);
+        }
+
+        private void initChild(object sender, RoutedEventArgs e)
+        {
             if (InternalChildren.Count > 0)
                 Initialize(InternalChildren[0]);
         }
@@ -43,12 +57,6 @@ namespace WPF_WallpaperCrop_v2
 
             child.RenderTransform = group;
             child.RenderTransformOrigin = new Point(0.0, 0.0);
-            MouseWheel += scaleChild;
-            MouseLeftButtonDown += startPan;
-            MouseLeftButtonUp += endPan;
-            MouseMove += panChild;
-            PreviewMouseRightButtonDown += new MouseButtonEventHandler(
-                child_PreviewMouseRightButtonDown);
         }
 
         public void Center()
@@ -122,7 +130,7 @@ namespace WPF_WallpaperCrop_v2
 
         void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            MessageBox.Show("right button pressed");
         }
 
         private void panChild(object sender, MouseEventArgs e)
