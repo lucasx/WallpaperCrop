@@ -80,7 +80,7 @@ namespace WPF_WallpaperCrop_v2
 
         internal void centerImage()
         {
-            canvas.Center();
+            canvas.centerChild();
         }
 
         /* Returns a rectange in the image's coordinate system (origin at top left of image)

@@ -56,7 +56,40 @@ namespace WPF_WallpaperCrop_v2
             child.RenderTransformOrigin = new Point(0.0, 0.0);
         }
 
-        public void Center()
+        /* Computes the real, rendered bounds of the child in pixels,
+         * relative to this. Takes render transforms into account. */
+        public Rect EffectiveChildBounds()
+        {
+            FrameworkElement fechild = (FrameworkElement)child;
+            return child.RenderTransform.TransformBounds( new Rect(new Size(fechild.ActualWidth, fechild.ActualHeight)) );
+        }
+
+        #region transform events
+
+        public void centerChild()
+        {
+            resetTranslation();
+            centerPosition();
+        }
+
+        /* Measures the size of the child and the size of the canvas and
+         * sets the position of the child so that the child is centered
+         * in the canvas. 
+         * ASSUMPTIONS: this will only center the child if there is no
+         * other translation transform being applied to the child. */
+        public void centerPosition()
+        {
+            Rect bounds = EffectiveChildBounds();
+            double dx = (ActualWidth - bounds.Width) / 2;
+            double dy = (ActualHeight - bounds.Height) / 2;
+
+            SetLeft(child, dx);
+            SetTop(child, dy);
+        }
+
+        /* Sets translation transformation to 0 on child element,
+         * effectively removing the translation. */
+        public void resetTranslation()
         {
             if (child != null)
             {
@@ -66,7 +99,7 @@ namespace WPF_WallpaperCrop_v2
             }
         }
 
-        public void ActualSize()
+        public void resetScale()
         {
             if (child != null)
             {
@@ -75,8 +108,6 @@ namespace WPF_WallpaperCrop_v2
                 st.ScaleY = 1.0;
             }
         }
-
-        #region transform events
 
         private void scaleChild(object sender, MouseWheelEventArgs e)
         {
