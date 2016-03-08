@@ -39,15 +39,12 @@ namespace WPF_WallpaperCrop_v2
                 child_PreviewMouseRightButtonDown);
         }
 
-        private void initChild(object sender, RoutedEventArgs e)
+        // CropCanvas ignores all children except the first child.
+        public void initChild(object sender, RoutedEventArgs e)
         {
-            if (InternalChildren.Count > 0)
-                Initialize(InternalChildren[0]);
-        }
+            if (InternalChildren.Count < 1) return;
 
-        public void Initialize(UIElement element)
-        {
-            child = element;
+            child = InternalChildren[0];
 
             TransformGroup group = new TransformGroup();
             ScaleTransform st = new ScaleTransform();
