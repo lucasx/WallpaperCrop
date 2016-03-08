@@ -13,6 +13,9 @@ namespace WPF_WallpaperCrop_v2
         private Point origin;
         private Point start;
 
+        /* Constants */
+        private double SCALE_SCROLL_INCREMENT = .1;
+
         private TranslateTransform GetTranslateTransform(UIElement element)
         {
             return (TranslateTransform)((TransformGroup)element.RenderTransform)
@@ -61,7 +64,7 @@ namespace WPF_WallpaperCrop_v2
         public Rect EffectiveChildBounds()
         {
             FrameworkElement fechild = (FrameworkElement)child;
-            return child.RenderTransform.TransformBounds( new Rect(new Size(fechild.ActualWidth, fechild.ActualHeight)) );
+            return child.RenderTransform.TransformBounds( new Rect(new Size(fechild.Width, fechild.Height)) );
         }
 
         #region transform events
@@ -80,6 +83,7 @@ namespace WPF_WallpaperCrop_v2
         public void centerPosition()
         {
             Rect bounds = EffectiveChildBounds();
+            MessageBox.Show(bounds.ToString());
             double dx = (ActualWidth - bounds.Width) / 2;
             double dy = (ActualHeight - bounds.Height) / 2;
 
@@ -116,7 +120,7 @@ namespace WPF_WallpaperCrop_v2
                 var st = GetScaleTransform(child);
                 var tt = GetTranslateTransform(child);
 
-                double zoom = e.Delta > 0 ? .2 : -.2;
+                double zoom = e.Delta > 0 ? SCALE_SCROLL_INCREMENT : -SCALE_SCROLL_INCREMENT;
                 if (!(e.Delta > 0) && (st.ScaleX < .4 || st.ScaleY < .4))
                     return;
 
