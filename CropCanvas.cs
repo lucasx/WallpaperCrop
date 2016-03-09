@@ -69,34 +69,15 @@ namespace WPF_WallpaperCrop_v2
 
         public void centerChild()
         {
-            resetTranslation();
-            centerPosition();
-        }
-
-        /* Measures the size of the child and the size of the canvas and
-         * sets the position of the child so that the child is centered
-         * in the canvas. 
-         * ASSUMPTIONS: this will only center the child if there is no
-         * other translation transform being applied to the child. */
-        public void centerPosition()
-        {
-            Rect bounds = EffectiveChildBounds();
-            double dx = (ActualWidth - bounds.Width) / 2;
-            double dy = (ActualHeight - bounds.Height) / 2;
-
-            SetLeft(child, dx);
-            SetTop(child, dy);
-        }
-
-        /* Sets translation transformation to 0 on child element,
-         * effectively removing the translation. */
-        public void resetTranslation()
-        {
             if (child != null)
             {
+                Rect bounds = EffectiveChildBounds();
+                double x = (ActualWidth - bounds.Width) / 2;
+                double y = (ActualHeight - bounds.Height) / 2;
+
                 var tt = GetTranslateTransform(child);
-                tt.X = 0.0;
-                tt.Y = 0.0;
+                tt.X = x;
+                tt.Y = y;
             }
         }
 

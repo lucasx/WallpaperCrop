@@ -79,7 +79,6 @@ namespace WPF_WallpaperCrop_v2
             image.Height = bitmapImage.PixelHeight;
 
             actualSize();
-            centerImage();
         }
 
         /* Center on canvas */
@@ -90,6 +89,7 @@ namespace WPF_WallpaperCrop_v2
         internal void actualSize()
         {
             canvas.resetScale();
+            canvas.centerChild();
         }
 
         /* Returns a rectange in the image's coordinate system (origin at top left of image)
