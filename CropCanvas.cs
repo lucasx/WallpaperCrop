@@ -72,13 +72,36 @@ namespace WPF_WallpaperCrop_v2
             if (child != null)
             {
                 Rect bounds = EffectiveChildBounds();
-                double x = (ActualWidth - bounds.Width) / 2;
-                double y = (ActualHeight - bounds.Height) / 2;
-
                 var tt = GetTranslateTransform(child);
-                tt.X = x;
-                tt.Y = y;
+                //double x = (ActualWidth - bounds.Width) / 2;
+                //double y = (ActualHeight - bounds.Height) / 2;
+
+                //tt.X = x;
+                //tt.Y = y;
+                centerX(bounds, tt);
+                centerY(bounds, tt);
             }
+        }
+
+        /* Centers the child ONLY in the directions that
+         * have blackspace (margin) showing. */
+        public void centerMargins(TranslateTransform tt)
+        {
+            if (child != null)
+            {
+                Rect bounds = EffectiveChildBounds();
+                if (ActualWidth > bounds.Width) centerX(bounds, tt);
+                if (ActualHeight > bounds.Height) centerY(bounds, tt);
+            }
+        }
+
+        private void centerX(Rect bounds, TranslateTransform tt)
+        {
+            tt.X = (ActualWidth - bounds.Width) / 2;
+        }
+        private void centerY(Rect bounds, TranslateTransform tt)
+        {
+            tt.Y = (ActualHeight - bounds.Height) / 2;
         }
 
         public void resetScale()
@@ -114,6 +137,32 @@ namespace WPF_WallpaperCrop_v2
 
                 tt.X = abosuluteX - relative.X * st.ScaleX;
                 tt.Y = abosuluteY - relative.Y * st.ScaleY;
+
+                // Lower zoom limit
+                stretchTo1Dim(EffectiveChildBounds(), st, tt);
+
+                centerMargins(tt);
+            }
+        }
+
+        /* If the given rectangle spans neither the width nor the 
+         * height dimensions of the canvas, increases the zoom 
+         * ungreedily so that the rectangle spans at least one
+         * of the dimensions. Returns the minimum zoom that 
+         * satisfies this constraint. */
+        private void stretchTo1Dim(Rect bounds, ScaleTransform st, TranslateTransform tt)
+        {
+            if (bounds.Width < ActualWidth && bounds.Height < ActualHeight)
+            {
+                double widthFactor = ActualWidth / bounds.Width;
+                double heightFactor = ActualHeight / bounds.Height;
+
+                double minFactor = Math.Min(widthFactor, heightFactor);
+                st.ScaleX *= minFactor; st.ScaleY *= minFactor;
+
+                bounds = EffectiveChildBounds();
+                if (widthFactor < heightFactor) centerX(bounds, tt);
+                else centerY(bounds, tt);
             }
         }
 
