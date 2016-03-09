@@ -168,8 +168,24 @@ namespace WPF_WallpaperCrop_v2
                     double x1 = origin.X - v.X;
                     double y1 = origin.Y - v.Y;
 
-                    tt.X = x1;
-                    tt.Y = y1;
+                    // keep within bounds
+                    Rect bounds = EffectiveChildBounds();
+
+                    if (bounds.Width > ActualWidth)
+                    {
+                        if (x1 > 0) x1 = 0; // left
+                        if (x1 < ActualWidth - bounds.Width) // right
+                            x1 = ActualWidth - bounds.Width;
+                        tt.X = x1;
+                    }
+
+                    if (bounds.Height > ActualHeight)
+                    {
+                        if (y1 > 0) y1 = 0; // top
+                        if (y1 < ActualHeight - bounds.Height) // bottom
+                            y1 = ActualHeight - bounds.Height;
+                        tt.Y = y1;
+                    }
                 }
             }
         }
