@@ -62,6 +62,11 @@ namespace WPF_WallpaperCrop_v2
             controls.Window_KeyUp(sender, e);
         }
 
+        private void Mouse_RightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            centerImage();
+        }
+
 
         ///////////////////////////////// Functionality stuff ///////////////////////////////////
 

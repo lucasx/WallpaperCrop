@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_WallpaperCrop_v2"
         mc:Ignorable="d"
-        Title="Preview" Height="300" Width="300" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+        Title="Preview" Height="300" Width="300" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp" MouseRightButtonDown="Mouse_RightButtonDown">
     <Grid>
         <Rectangle Fill="Black" />
         <local:CropCanvas x:Name="canvas">
