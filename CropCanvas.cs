@@ -10,6 +10,12 @@ namespace WPF_WallpaperCrop_v2
     class CropCanvas : Canvas
     {
         private UIElement child = null;
+        
+        /* The rectangle representing the bounds of the child element.
+         * Must be kept up to date - methods that affect the bounds must
+         * manually call the updateChildBounds() method. */
+        private Rect cbounds; 
+
         private Point origin;
         private Point start;
 
@@ -57,12 +63,12 @@ namespace WPF_WallpaperCrop_v2
             child.RenderTransformOrigin = new Point(0.0, 0.0);
         }
 
-        /* Computes the real, rendered bounds of the child in pixels,
+        /* Recomputes the real, rendered bounds of the child in pixels,
          * relative to this. Takes render transforms into account. */
-        public Rect EffectiveChildBounds()
+        public void updateChildBounds()
         {
             FrameworkElement fechild = (FrameworkElement)child;
-            return child.RenderTransform.TransformBounds( new Rect(new Size(fechild.Width, fechild.Height)) );
+            cbounds = child.RenderTransform.TransformBounds( new Rect(new Size(fechild.Width, fechild.Height)) );
         }
 
         #region transform events
@@ -71,37 +77,22 @@ namespace WPF_WallpaperCrop_v2
         {
             if (child != null)
             {
-                Rect bounds = EffectiveChildBounds();
                 var tt = GetTranslateTransform(child);
-                //double x = (ActualWidth - bounds.Width) / 2;
-                //double y = (ActualHeight - bounds.Height) / 2;
 
-                //tt.X = x;
-                //tt.Y = y;
-                centerX(bounds, tt);
-                centerY(bounds, tt);
+                centerX(tt);
+                centerY(tt);
+
+                updateChildBounds();
             }
         }
 
-        /* Centers the child ONLY in the directions that
-         * have blackspace (margin) showing. */
-        public void centerMargins(TranslateTransform tt)
+        private void centerX(TranslateTransform tt)
         {
-            if (child != null)
-            {
-                Rect bounds = EffectiveChildBounds();
-                if (ActualWidth > bounds.Width) centerX(bounds, tt);
-                if (ActualHeight > bounds.Height) centerY(bounds, tt);
-            }
+            tt.X = (ActualWidth - cbounds.Width) / 2;
         }
-
-        private void centerX(Rect bounds, TranslateTransform tt)
+        private void centerY(TranslateTransform tt)
         {
-            tt.X = (ActualWidth - bounds.Width) / 2;
-        }
-        private void centerY(Rect bounds, TranslateTransform tt)
-        {
-            tt.Y = (ActualHeight - bounds.Height) / 2;
+            tt.Y = (ActualHeight - cbounds.Height) / 2;
         }
 
         public void resetScale()
@@ -111,6 +102,8 @@ namespace WPF_WallpaperCrop_v2
                 var st = GetScaleTransform(child);
                 st.ScaleX = 1.0;
                 st.ScaleY = 1.0;
+
+                updateChildBounds();
             }
         }
 
@@ -139,21 +132,29 @@ namespace WPF_WallpaperCrop_v2
 
                 tt.X = abosuluteX - relative.X * st.ScaleX;
                 tt.Y = abosuluteY - relative.Y * st.ScaleY;
-                
+
+                updateChildBounds();
+
                 lowerZoomLimit(st, tt); // Lower zoom limit
             }
         }
 
+        /* Clips scale to 1 or less. 
+         * Simple arithmetic, no updates needed. */
         private void upperZoomLimit(ScaleTransform st)
         {
             if (st.ScaleX > 1) st.ScaleX = 1;
             if (st.ScaleY > 1) st.ScaleY = 1;
         }
 
+        /* Rescales and positions child to fit properly in the canvas.
+         * Enforces the limit that the child must be at least large enough
+         * to span one direction of the canvas - either width or height.
+         * Assumes the global bounds variable is up to date. */
         private void lowerZoomLimit(ScaleTransform st, TranslateTransform tt)
         {
-            stretchTo1Dim(EffectiveChildBounds(), st);
-            minimizeBlackspace(EffectiveChildBounds(), tt);
+            stretchTo1Dim(st);
+            minimizeBlackspace(tt);
         }
 
         /* If the given rectangle spans neither the width nor the 
@@ -161,15 +162,17 @@ namespace WPF_WallpaperCrop_v2
          * ungreedily so that the rectangle spans at least one
          * of the dimensions. Returns the minimum zoom that 
          * satisfies this constraint. */
-        private void stretchTo1Dim(Rect bounds, ScaleTransform st)
+        private void stretchTo1Dim(ScaleTransform st)
         {
-            if (bounds.Width < ActualWidth && bounds.Height < ActualHeight)
+            if (cbounds.Width < ActualWidth && cbounds.Height < ActualHeight)
             {
-                double widthFactor = ActualWidth / bounds.Width;
-                double heightFactor = ActualHeight / bounds.Height;
+                double widthFactor = ActualWidth / cbounds.Width;
+                double heightFactor = ActualHeight / cbounds.Height;
 
                 double minFactor = Math.Min(widthFactor, heightFactor);
                 st.ScaleX *= minFactor; st.ScaleY *= minFactor;
+
+                updateChildBounds();
             }
         }
 
@@ -178,15 +181,17 @@ namespace WPF_WallpaperCrop_v2
          * blackspace in a particular direction, splits the blackspace
          * equally on each side of the rectangle. Does nothing
          * if the rectangle already covers the entire canvas. */
-        private void minimizeBlackspace(Rect bounds, TranslateTransform tt)
+        private void minimizeBlackspace(TranslateTransform tt)
         {
             // width
-            if (bounds.Width > ActualWidth) tt.X = clipX(bounds.X, bounds.Width);
-            else centerX(bounds, tt);
+            if (cbounds.Width > ActualWidth) tt.X = clipX(cbounds.X, cbounds.Width);
+            else centerX(tt);
 
             // height
-            if (bounds.Height > ActualHeight) tt.Y = clipY(bounds.Y, bounds.Height);
-            else centerY(bounds, tt);
+            if (cbounds.Height > ActualHeight) tt.Y = clipY(cbounds.Y, cbounds.Height);
+            else centerY(tt); // TODO: Make like clipY
+
+            updateChildBounds();
         }
 
         /* If x is outside the range from ActualWidth - width to 0,
@@ -240,14 +245,14 @@ namespace WPF_WallpaperCrop_v2
                     double x1 = origin.X - v.X;
                     double y1 = origin.Y - v.Y;
 
-                    // keep within bounds
-                    Rect bounds = EffectiveChildBounds();
+                    // keep within cbounds
+                    if (cbounds.Width > ActualWidth)
+                        tt.X = clipX(x1, cbounds.Width);
 
-                    if (bounds.Width > ActualWidth)
-                        tt.X = clipX(x1, bounds.Width);
+                    if (cbounds.Height > ActualHeight)
+                        tt.Y = clipY(y1, cbounds.Height);
 
-                    if (bounds.Height > ActualHeight)
-                        tt.Y = clipY(y1, bounds.Height);
+                    updateChildBounds();
                 }
             }
         }
