@@ -139,10 +139,15 @@ namespace WPF_WallpaperCrop_v2
                 tt.Y = abosuluteY - relative.Y * st.ScaleY;
 
                 // Lower zoom limit
-                stretchTo1Dim(EffectiveChildBounds(), st, tt);
-
-                centerMargins(tt);
+                lowerZoomLimit(st, tt);
+                // TODO: Upper zoom limit
             }
+        }
+
+        private void lowerZoomLimit(ScaleTransform st, TranslateTransform tt)
+        {
+            stretchTo1Dim(EffectiveChildBounds(), st);
+            minimizeBlackspace(EffectiveChildBounds(), tt);
         }
 
         /* If the given rectangle spans neither the width nor the 
@@ -150,7 +155,7 @@ namespace WPF_WallpaperCrop_v2
          * ungreedily so that the rectangle spans at least one
          * of the dimensions. Returns the minimum zoom that 
          * satisfies this constraint. */
-        private void stretchTo1Dim(Rect bounds, ScaleTransform st, TranslateTransform tt)
+        private void stretchTo1Dim(Rect bounds, ScaleTransform st)
         {
             if (bounds.Width < ActualWidth && bounds.Height < ActualHeight)
             {
@@ -159,11 +164,42 @@ namespace WPF_WallpaperCrop_v2
 
                 double minFactor = Math.Min(widthFactor, heightFactor);
                 st.ScaleX *= minFactor; st.ScaleY *= minFactor;
-
-                bounds = EffectiveChildBounds();
-                if (widthFactor < heightFactor) centerX(bounds, tt);
-                else centerY(bounds, tt);
             }
+        }
+
+        /* Adjusts the translate transform so that the given rectangle
+         * covers as much of the canvas as possible. If there must be
+         * blackspace in a particular direction, splits the blackspace
+         * equally on each side of the rectangle. Does nothing
+         * if the rectangle already covers the entire canvas. */
+        private void minimizeBlackspace(Rect bounds, TranslateTransform tt)
+        {
+            // width
+            if (bounds.Width > ActualWidth) tt.X = clipX(bounds.X, bounds.Width);
+            else centerX(bounds, tt);
+
+            // height
+            if (bounds.Height > ActualHeight) tt.Y = clipY(bounds.Y, bounds.Height);
+            else centerY(bounds, tt);
+        }
+
+        /* If x is outside the range from ActualWidth - width to 0,
+         * x is set to the nearest edge of that range, then x is returned. */
+        private double clipX(double x, double width)
+        {
+            if (x > 0) x = 0; // left
+            if (x < ActualWidth - width) // right
+                x = ActualWidth - width;
+            return x;
+        }
+        /* If y is outside the range from ActualHeight - height to 0,
+         * y is set to the nearest edge of that range, then y is returned. */
+        private double clipY(double y, double height)
+        {
+            if (y > 0) y = 0; // top
+            if (y < ActualHeight - height) // bottom
+                y = ActualHeight - height;
+            return y;
         }
 
         private void startPan(object sender, MouseButtonEventArgs e)
@@ -202,20 +238,10 @@ namespace WPF_WallpaperCrop_v2
                     Rect bounds = EffectiveChildBounds();
 
                     if (bounds.Width > ActualWidth)
-                    {
-                        if (x1 > 0) x1 = 0; // left
-                        if (x1 < ActualWidth - bounds.Width) // right
-                            x1 = ActualWidth - bounds.Width;
-                        tt.X = x1;
-                    }
+                        tt.X = clipX(x1, bounds.Width);
 
                     if (bounds.Height > ActualHeight)
-                    {
-                        if (y1 > 0) y1 = 0; // top
-                        if (y1 < ActualHeight - bounds.Height) // bottom
-                            y1 = ActualHeight - bounds.Height;
-                        tt.Y = y1;
-                    }
+                        tt.Y = clipY(y1, bounds.Height);
                 }
             }
         }
