@@ -134,14 +134,20 @@ namespace WPF_WallpaperCrop_v2
 
                 st.ScaleX += zoom;
                 st.ScaleY += zoom;
+                
+                upperZoomLimit(st); // Upper zoom limit
 
                 tt.X = abosuluteX - relative.X * st.ScaleX;
                 tt.Y = abosuluteY - relative.Y * st.ScaleY;
-
-                // Lower zoom limit
-                lowerZoomLimit(st, tt);
-                // TODO: Upper zoom limit
+                
+                lowerZoomLimit(st, tt); // Lower zoom limit
             }
+        }
+
+        private void upperZoomLimit(ScaleTransform st)
+        {
+            if (st.ScaleX > 1) st.ScaleX = 1;
+            if (st.ScaleY > 1) st.ScaleY = 1;
         }
 
         private void lowerZoomLimit(ScaleTransform st, TranslateTransform tt)
