@@ -71,7 +71,45 @@ namespace WPF_WallpaperCrop_v2
             cbounds = child.RenderTransform.TransformBounds( new Rect(new Size(fechild.Width, fechild.Height)) );
         }
 
-        #region transform events
+        #region transfrom primitives
+
+        /* Given the width of an element within this canvas,
+         * returns the x coordinate the element should be at
+         * in order to be centered on the canvas. */
+        private double centerX(double width)
+        {
+            return (ActualWidth - width) / 2;
+        }
+        /* Given the height of an element within this canvas,
+         * returns the y coordinate the element should be at
+         * in order to be centered on the canvas. */
+        private double centerY(double height)
+        {
+            return (ActualHeight - height) / 2;
+        }
+
+        /* If x is outside the range from ActualWidth - width to 0,
+         * x is set to the nearest edge of that range, then x is returned. */
+        private double clipX(double x, double width)
+        {
+            if (x > 0) x = 0; // left
+            if (x < ActualWidth - width) // right
+                x = ActualWidth - width;
+            return x;
+        }
+        /* If y is outside the range from ActualHeight - height to 0,
+         * y is set to the nearest edge of that range, then y is returned. */
+        private double clipY(double y, double height)
+        {
+            if (y > 0) y = 0; // top
+            if (y < ActualHeight - height) // bottom
+                y = ActualHeight - height;
+            return y;
+        }
+
+        #endregion
+
+        #region transform macros
 
         public void centerChild()
         {
@@ -79,20 +117,11 @@ namespace WPF_WallpaperCrop_v2
             {
                 var tt = GetTranslateTransform(child);
 
-                centerX(tt);
-                centerY(tt);
+                tt.X = centerX(cbounds.Width);
+                tt.Y = centerY(cbounds.Height);
 
                 updateChildBounds();
             }
-        }
-
-        private void centerX(TranslateTransform tt)
-        {
-            tt.X = (ActualWidth - cbounds.Width) / 2;
-        }
-        private void centerY(TranslateTransform tt)
-        {
-            tt.Y = (ActualHeight - cbounds.Height) / 2;
         }
 
         public void resetScale()
@@ -106,6 +135,47 @@ namespace WPF_WallpaperCrop_v2
                 updateChildBounds();
             }
         }
+
+        /* If the given rectangle spans neither the width nor the 
+         * height dimensions of the canvas, increases the zoom 
+         * ungreedily so that the rectangle spans at least one
+         * of the dimensions. Returns the minimum zoom that 
+         * satisfies this constraint. */
+        private void stretchTo1Dim(ScaleTransform st)
+        {
+            if (cbounds.Width < ActualWidth && cbounds.Height < ActualHeight)
+            {
+                double widthFactor = ActualWidth / cbounds.Width;
+                double heightFactor = ActualHeight / cbounds.Height;
+
+                double minFactor = Math.Min(widthFactor, heightFactor);
+                st.ScaleX *= minFactor; st.ScaleY *= minFactor;
+
+                updateChildBounds();
+            }
+        }
+
+        /* Adjusts the translate transform so that the given rectangle
+         * covers as much of the canvas as possible. If there must be
+         * blackspace in a particular direction, splits the blackspace
+         * equally on each side of the rectangle. Does nothing
+         * if the rectangle already covers the entire canvas. */
+        private void minimizeBlackspace(TranslateTransform tt)
+        {
+            // width
+            if (cbounds.Width > ActualWidth) tt.X = clipX(cbounds.X, cbounds.Width);
+            else tt.X = centerX(cbounds.Width);
+
+            // height
+            if (cbounds.Height > ActualHeight) tt.Y = clipY(cbounds.Y, cbounds.Height);
+            else tt.Y = centerY(cbounds.Height);
+
+            updateChildBounds();
+        }
+
+        #endregion
+
+        #region transform events
 
         private void scaleChild(object sender, MouseWheelEventArgs e)
         {
@@ -155,62 +225,6 @@ namespace WPF_WallpaperCrop_v2
         {
             stretchTo1Dim(st);
             minimizeBlackspace(tt);
-        }
-
-        /* If the given rectangle spans neither the width nor the 
-         * height dimensions of the canvas, increases the zoom 
-         * ungreedily so that the rectangle spans at least one
-         * of the dimensions. Returns the minimum zoom that 
-         * satisfies this constraint. */
-        private void stretchTo1Dim(ScaleTransform st)
-        {
-            if (cbounds.Width < ActualWidth && cbounds.Height < ActualHeight)
-            {
-                double widthFactor = ActualWidth / cbounds.Width;
-                double heightFactor = ActualHeight / cbounds.Height;
-
-                double minFactor = Math.Min(widthFactor, heightFactor);
-                st.ScaleX *= minFactor; st.ScaleY *= minFactor;
-
-                updateChildBounds();
-            }
-        }
-
-        /* Adjusts the translate transform so that the given rectangle
-         * covers as much of the canvas as possible. If there must be
-         * blackspace in a particular direction, splits the blackspace
-         * equally on each side of the rectangle. Does nothing
-         * if the rectangle already covers the entire canvas. */
-        private void minimizeBlackspace(TranslateTransform tt)
-        {
-            // width
-            if (cbounds.Width > ActualWidth) tt.X = clipX(cbounds.X, cbounds.Width);
-            else centerX(tt);
-
-            // height
-            if (cbounds.Height > ActualHeight) tt.Y = clipY(cbounds.Y, cbounds.Height);
-            else centerY(tt); // TODO: Make like clipY
-
-            updateChildBounds();
-        }
-
-        /* If x is outside the range from ActualWidth - width to 0,
-         * x is set to the nearest edge of that range, then x is returned. */
-        private double clipX(double x, double width)
-        {
-            if (x > 0) x = 0; // left
-            if (x < ActualWidth - width) // right
-                x = ActualWidth - width;
-            return x;
-        }
-        /* If y is outside the range from ActualHeight - height to 0,
-         * y is set to the nearest edge of that range, then y is returned. */
-        private double clipY(double y, double height)
-        {
-            if (y > 0) y = 0; // top
-            if (y < ActualHeight - height) // bottom
-                y = ActualHeight - height;
-            return y;
         }
 
         private void startPan(object sender, MouseButtonEventArgs e)
