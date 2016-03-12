@@ -9,30 +9,26 @@ namespace WPF_WallpaperCrop_v2
 {
     class CropCanvas : Canvas
     {
+
+        /* Globals */
+
         private UIElement child = null;
         
         /* The rectangle representing the bounds of the child element.
          * Must be kept up to date - methods that affect the bounds must
          * manually call the updateChildBounds() method. */
-        private Rect cbounds; 
+        private Rect cbounds;
 
+        /* The child element's exposed transform handles. */
+        private ScaleTransform st;
+        private TranslateTransform tt;
+
+        /* Panning globals */
         private Point origin;
         private Point start;
 
         /* Constants */
         private double SCALE_SCROLL_INCREMENT = .1;
-
-        private TranslateTransform GetTranslateTransform(UIElement element)
-        {
-            return (TranslateTransform)((TransformGroup)element.RenderTransform)
-              .Children.First(tr => tr is TranslateTransform);
-        }
-
-        private ScaleTransform GetScaleTransform(UIElement element)
-        {
-            return (ScaleTransform)((TransformGroup)element.RenderTransform)
-              .Children.First(tr => tr is ScaleTransform);
-        }
 
         public CropCanvas() : base()
         {
@@ -54,9 +50,9 @@ namespace WPF_WallpaperCrop_v2
             child = InternalChildren[0];
 
             TransformGroup group = new TransformGroup();
-            ScaleTransform st = new ScaleTransform();
+            st = new ScaleTransform();
             group.Children.Add(st);
-            TranslateTransform tt = new TranslateTransform();
+            tt = new TranslateTransform();
             group.Children.Add(tt);
 
             child.RenderTransform = group;
@@ -115,8 +111,6 @@ namespace WPF_WallpaperCrop_v2
         {
             if (child != null)
             {
-                var tt = GetTranslateTransform(child);
-
                 tt.X = centerX(cbounds.Width);
                 tt.Y = centerY(cbounds.Height);
 
@@ -128,7 +122,6 @@ namespace WPF_WallpaperCrop_v2
         {
             if (child != null)
             {
-                var st = GetScaleTransform(child);
                 st.ScaleX = 1.0;
                 st.ScaleY = 1.0;
 
@@ -181,9 +174,6 @@ namespace WPF_WallpaperCrop_v2
         {
             if (child != null)
             {
-                var st = GetScaleTransform(child);
-                var tt = GetTranslateTransform(child);
-
                 double zoom = e.Delta > 0 ? SCALE_SCROLL_INCREMENT : -SCALE_SCROLL_INCREMENT;
                 if (!(e.Delta > 0) && (st.ScaleX < .4 || st.ScaleY < .4))
                     return;
@@ -231,7 +221,6 @@ namespace WPF_WallpaperCrop_v2
         {
             if (child != null)
             {
-                var tt = GetTranslateTransform(child);
                 start = e.GetPosition(this);
                 origin = new Point(tt.X, tt.Y);
                 this.Cursor = Cursors.Hand;
@@ -254,7 +243,6 @@ namespace WPF_WallpaperCrop_v2
             {
                 if (child.IsMouseCaptured)
                 {
-                    var tt = GetTranslateTransform(child);
                     Vector v = start - e.GetPosition(this);
                     double x1 = origin.X - v.X;
                     double y1 = origin.Y - v.Y;
