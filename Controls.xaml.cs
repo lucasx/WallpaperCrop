@@ -67,8 +67,6 @@ namespace WPF_WallpaperCrop_v2
                 System.Drawing.Rectangle bounds = screen.Bounds;
                 this.Left = bounds.Right - this.Width - X_MARGIN;
                 this.Top = bounds.Bottom - this.Height - Y_MARGIN;
-                //this.Left = screen.Bounds.Left;
-                //this.Top = screen.Bounds.Top;
             }
 
             //// Maximize window
@@ -137,9 +135,9 @@ namespace WPF_WallpaperCrop_v2
             if (imageChooser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 Uri imageUri = new Uri(imageChooser.FileName);
-                BitmapImage bitmapimage = new BitmapImage(imageUri);
-                image.Source = bitmapimage;
-                preview.setImage(bitmapimage);
+                BitmapSource src = create96dpiImage(imageUri);
+                image.Source = src;
+                preview.setImage(src);
             }
         }
 
@@ -149,11 +147,9 @@ namespace WPF_WallpaperCrop_v2
             wallpaperSaver.Filter = "PNG|*.png";
             if (wallpaperSaver.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                // Extrude wallpaper
-                Int32Rect bounds = preview.getBounds();
-                BitmapSource wallpaper = extrudeTo(bounds, (BitmapSource)image.Source);
-
-                // Save result
+                RenderTargetBitmap wallpaper = new RenderTargetBitmap((int)preview.ActualWidth, (int)preview.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                wallpaper.Render(preview);
+                
                 string path = wallpaperSaver.FileName;
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(wallpaper));
@@ -169,31 +165,17 @@ namespace WPF_WallpaperCrop_v2
 
         ///////////////////////////////// Image processing stuff ////////////////////////////////////////////
 
-        /* Crops the src to fit in the bounds, then fills any unoccupied pixels
-         * with blackspace. Returns a bitmap that is the exact size of the bounds. */
-        private BitmapSource extrudeTo(Int32Rect bounds, BitmapSource src)
+        /* Returns a 96dpi BitmapImage from the given uri. */
+        private BitmapSource create96dpiImage(Uri uri)
         {
-            // Crop src image
-            Int32Rect cropRect = new Int32Rect();
-            cropRect.X = Math.Max(0, bounds.X);
-            cropRect.Y = Math.Max(0, bounds.Y);
-            cropRect.Width = Math.Min(src.PixelWidth - cropRect.X, bounds.Width);
-            cropRect.Height = Math.Min(bounds.Height, src.PixelHeight - cropRect.Y);
+            double DPI = 96;
+            BitmapSource src = new BitmapImage(uri);
 
-            // Pad with blackspace
-            WriteableBitmap result = new WriteableBitmap(5760, 1080, src.DpiX, src.DpiY, src.Format, src.Palette);
+            int stride = src.PixelWidth * src.Format.BitsPerPixel / 8;
+            byte[] pixelData = new byte[src.PixelHeight * stride];
+            src.CopyPixels(pixelData, stride, 0);
 
-            Int32Rect imagePos = new Int32Rect();
-            imagePos.X = -Math.Min(bounds.X, 0);    imagePos.Y = -Math.Min(bounds.Y, 0);
-            imagePos.Width = cropRect.Width;        imagePos.Height = cropRect.Height;
-
-            int stride = src.PixelWidth * src.Format.BitsPerPixel / 8; // bytes per row of pixels in the image
-            byte[] pixels = new byte[src.PixelHeight * stride];
-            src.CopyPixels(cropRect, pixels, stride, 0);
-
-            result.WritePixels(imagePos, pixels, stride, 0);
-
-            return result;
+            return BitmapSource.Create(src.PixelWidth, src.PixelHeight, DPI, DPI, src.Format, src.Palette, pixelData, stride);
         }
     }
 }

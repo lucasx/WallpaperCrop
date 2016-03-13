@@ -28,7 +28,7 @@ namespace WPF_WallpaperCrop_v2
         private Point start;
 
         /* Constants */
-        private double SCALE_SCROLL_INCREMENT = .1;
+        private double SCALE_SCROLL_INCREMENT = .02;
 
         public CropCanvas() : base()
         {
